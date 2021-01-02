@@ -42,6 +42,7 @@ Adafruit_MQTT_Publish temperaturaValue = Adafruit_MQTT_Publish(&mqtt, AIO_USERNA
 Adafruit_MQTT_Publish humedadValue = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/"AIO_GROUP"humedadvalue");
 Adafruit_MQTT_Publish alarmahumo = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/"AIO_GROUP"alarmahumo");
 Adafruit_MQTT_Publish focoexterno_publish = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/"AIO_GROUP"focoexterno");
+Adafruit_MQTT_Publish cochera_publish = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/"AIO_GROUP"cochera");
 
 
 
@@ -366,6 +367,12 @@ void Led(){
           }
         }else{
           Serial.println("Objecto obtruyendo cochera !!!!!");
+          if (! cochera_publish.publish(1719)) {
+            Serial.println(F("Failed Cochera:("));
+          } else {
+            Serial.println(F("Actualizando Cochera publish!!"));
+            Serial.println(1719);
+          }
         }
       }
 
@@ -518,25 +525,32 @@ void saveAlarma(){
 
 void FocoExterno(){
   int luminosidad = 0;int movimiento = 0;
+
+
+  
       luminosidad = analogRead(A0);
-      Serial.print("Luminosidad: ");
+      Serial.print("Luminosidad en proceso: ");
       Serial.println(luminosidad);
-  
-  
-   
-      if(luminosidad < 100){
- 
-          
+      if(millis()-tiempoUltimaLectura>15000){
+
+        Serial.print("Luminosidad : ");
+        Serial.println(luminosidad);
+
            movimiento = digitalRead(sensorPIR);//leemos el movimiento
            Serial.print("Movimiento: ");
            Serial.println(movimiento);
-           
-           if(millis()-tiempoUltimaLectura>15000){
+
+         if(luminosidad < 100){
             Serial.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-              Wire.beginTransmission(1);
+            delay(100);
+            movimiento = digitalRead(sensorPIR);//leemos el movimiento
+            Serial.print("Movimiento: ");
+            Serial.println(movimiento);
+
+            Wire.beginTransmission(1);
                 accion = 1;
                 if(movimiento == HIGH){ //vemos si hay movimiento
-        
+                  
                    if (! focoexterno_publish.publish("ON")) {
                     Serial.println(F("Failed Foco externo:("));
                   } else {
@@ -561,6 +575,32 @@ void FocoExterno(){
                   }
                 }
               Wire.endTransmission();
+          }
+
+          Serial.println("Luminosidad alta, Subiendo adafruit OFF!!!!");
+          if (! focoexterno_publish.publish("OFF")) {
+                    Serial.println(F("Failed Foco externo:("));
+                  } else {
+                      Wire.write(accion);
+                      ledID = 8;
+                      Wire.write(ledID);
+                      Wire.write(1);
+                    Serial.println(F("Actualizando Foco externo a OFF!!"));
+        
+                  }
+        
+        
+      } 
+ 
+   
+     
+ 
+          
+           
+           
+           
+            
+              
             contador=0;
             tiempoUltimaLectura=millis();
             }

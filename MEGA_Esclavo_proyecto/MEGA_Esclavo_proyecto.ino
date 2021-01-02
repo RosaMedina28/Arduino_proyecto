@@ -9,7 +9,7 @@ const int pindisplay = 33;
 const int display1[7] = { 35, 37, 39, 41, 43, 45, 47 }; 
 const int display2[7] = { 34, 36, 38, 40, 42, 44, 46 }; 
 const int ledPin = 8, l_bano = 22, l_sala = 24, l_oficina = 26, l_cocina = 28, l_cuarto = 30;
-int alarma = 0,evento = 1, buzzer = 31,relevador_foco = 3;
+int alarma = 0,evento = 1, buzzer = 31,relevador_foco = 3,buzzer_cochera = 4;
 int sensorhumo =0,humo;
 bool sensorvalue=false;
 const byte numbersDisplayAnode[10] = {
@@ -39,6 +39,7 @@ void setup() {
   pinMode(l_cuarto, OUTPUT);
   pinMode(pindisplay, OUTPUT);
   pinMode(buzzer, OUTPUT);
+  pinMode(buzzer_cochera, OUTPUT);
   pinMode(relevador_foco, OUTPUT);
   digitalWrite(relevador_foco, HIGH);
 
@@ -137,15 +138,45 @@ void receiveEvent(int howMany) {
         break;
         case 7: //COCHERA
           Serial.println("Servo activado!!!");
-          if(estado == 0){
+          if(estado == 0){ //Cerrando cochera
             // Desplazamos a la posición 90º
-            servoMotor.write(90);
-            // Esperamos 1 segundo
+            servoMotor.write(30);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
+            servoMotor.write(30);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
+            servoMotor.write(30);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
             
-          }else{
+            
+          }else{ //Abriendo cochera
             // Desplazamos a la posición 180º
-            servoMotor.write(180);
-            // Esperamos 1 segundo
+            servoMotor.write(40);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
+            servoMotor.write(40);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
+            servoMotor.write(40);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
+            servoMotor.write(40);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
+            servoMotor.write(20);
+            digitalWrite(buzzer_cochera, HIGH);
+            delay(500);
+            digitalWrite(buzzer_cochera, LOW);
+            
             
           }
         break;
